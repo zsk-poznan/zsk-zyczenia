@@ -2,26 +2,32 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import { writeFileSync, watch } from "fs";
 import csvToJson from "convert-csv-to-json";
 
 var app = express();
 var port = process.env.PORT;
 
-type DataTypes = {
-  ID: number;
-  Nazwa: string;
-  Zyczenie: string;
-}
+watch(__dirname + "/data/zyczenia.csv", (event, filename) => {
+  const getJson = csvToJson.getJsonFromCsv(__dirname + "/data/" + filename);
 
-const jsonData: Array<DataTypes> = [];
+  type DataTypes = {
+    ID: string;
+    Nazwa: string;
+    Zyczenie: string;
+  };
 
-let json = csvToJson.getJsonFromCsv(__dirname + "/data/zyczenia.csv");
-for (let i = 0; i < json.length; i++) {
-  jsonData.push(json[i]);
-}
+  const jsonData = <Array<DataTypes>>[];
+
+  for (let i = 0; i < getJson.length; i++) {
+    jsonData.push(getJson[i]);
+  }
+
+  writeFileSync(__dirname + "/data/data.json", JSON.stringify(jsonData));
+});
 
 app.get("/", (req, res) => {
-  return res.json(jsonData);
+  res.sendFile(__dirname + "/data/data.json");
 });
 
 app.listen(port, () => {
