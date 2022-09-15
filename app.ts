@@ -7,7 +7,13 @@ import csvToJson from "convert-csv-to-json";
 var app = express();
 var port = process.env.PORT;
 
-const jsonData: Array<{ ID: number; Nazwa: string; Zyczenie: string }> = [];
+type DataTypes = {
+  ID: number;
+  Nazwa: string;
+  Zyczenie: string;
+}
+
+const jsonData: Array<DataTypes> = [];
 
 let json = csvToJson.getJsonFromCsv(__dirname + "/data/zyczenia.csv");
 for (let i = 0; i < json.length; i++) {
