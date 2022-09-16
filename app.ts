@@ -14,15 +14,14 @@ var watcher = chokidar.watch(__dirname + "/data/zyczenia.csv", {
   persistent: true,
 });
 
+type DataTypes = {
+  ID: string;
+  Nazwa: string;
+  Zyczenie: string;
+};
+
 function parseCsvData() {
   const getJson = csvToJson.getJsonFromCsv(__dirname + "/data/zyczenia.csv");
-
-  type DataTypes = {
-    ID: string;
-    Nazwa: string;
-    Zyczenie: string;
-  };
-
   const jsonData = <Array<DataTypes>>[];
 
   for (const data of getJson) {
