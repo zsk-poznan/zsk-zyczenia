@@ -8,16 +8,15 @@ import { writeFileSync } from "fs";
 
 var app = express();
 var port = process.env.PORT;
-
 var watcher = chokidar.watch(__dirname + "/data/zyczenia.csv", {
   ignored: /^\./,
   persistent: true,
 });
 
 type DataTypes = {
-  ID: string;
-  Nazwa: string;
-  Zyczenie: string;
+  id: number;
+  nazwa: string;
+  zyczenie: string;
 };
 
 function parseCsvData() {
@@ -25,17 +24,29 @@ function parseCsvData() {
   const jsonData = <Array<DataTypes>>[];
 
   for (const data of getJson) {
-    jsonData.push(data);
+    const parsedData = {
+      "id": parseInt(data.ID),
+      "nazwa": data.Nazwa,
+      "zyczenie": data.Zyczenie
+    }
+
+    jsonData.push(parsedData);
   }
 
   writeFileSync(__dirname + "/data/data.json", JSON.stringify(jsonData));
 }
 
-watcher
-  .on("add", () => parseCsvData())
-  .on("change", () => parseCsvData());
+watcher.on("add", () => parseCsvData()).on("change", () => parseCsvData());
 
-app.get("/", (req, res) => {
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Credentials', Boolean(true).toString());
+  next();
+});
+
+app.get("/api/", (req, res) => {
   res.sendFile(__dirname + "/data/data.json");
 });
 
