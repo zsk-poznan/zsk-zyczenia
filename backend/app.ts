@@ -49,7 +49,7 @@ app.get("/api/", (req, res) => {
   const resultFile = readFileSync("./data/data.json", "utf8");
   const resultData = JSON.parse(resultFile);
 
-  res.send(resultData[Math.floor(Math.random() * resultData.length)]);
+  res.send([resultData[Math.floor(Math.random() * resultData.length)]]);
 });
 
 app.listen(port, () => {
