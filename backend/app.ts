@@ -38,23 +38,26 @@ const parseCsv = () => {
 watcher
   .on("add", () => {
     parseCsv();
+    console.info(`Plik zyczenia.csv został pomyślnie wykryty!`);
   })
   .on("change", () => {
     parseCsv();
+    console.info(`Nastąpiła modyfikacja pliku zyczenia.csv - parsuję...`);
   });
 
-app.use(cors());
+app
+  .use(cors())
+  .get("/api/", (req, res) => {
+    const resultFile = readFileSync(__dirname + "/data/data.json", "utf8");
+    const resultData = JSON.parse(resultFile);
+    const randomData = Math.floor(Math.random() * resultData.length);
 
-app.get("/api/", (req, res) => {
-  const resultFile = readFileSync("./data/data.json", "utf8");
-  const resultData = JSON.parse(resultFile);
+    res.send([resultData[randomData]]);
+  })
 
-  res.send([resultData[Math.floor(Math.random() * resultData.length)]]);
-});
-
-app.listen(port, () => {
-  console.log(
-    `\x1b[0mAplikacja działa na porcie :${port}. Baw się dobrze z danymi!`,
-    `\x1b[34m\nlocalhost:${port} http://localhost:${port}/api/\x1b[0m`
-  );
-});
+  .listen(port, () => {
+    console.log(
+      `\x1b[0mAplikacja działa na porcie :${port}. Baw się dobrze z danymi!\n`,
+      `\x1b[34m\nlocalhost:${port} http://localhost:${port}/api/\x1b[0m\n`
+    );
+  });
