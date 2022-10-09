@@ -1,10 +1,5 @@
-import * as dotenv from "dotenv";
+import { dotenv, express, cors, chokidar, csvToJson, fs } from "./lib";
 dotenv.config();
-import express from "express";
-import cors from "cors";
-import chokidar from "chokidar";
-import csvToJson from "convert-csv-to-json";
-import { writeFileSync, readFileSync } from "fs";
 
 const app = express();
 const port = process.env.PORT;
@@ -16,8 +11,9 @@ const watcher = chokidar.watch(__dirname + "/data/zyczenia.csv", {
 app
   .use(cors())
   .get("/api/", (req, res) => {
-    const resultFile = readFileSync(__dirname + "/data/data.json", "utf8");
-    const resultData = JSON.parse(resultFile);
+    const resultData = JSON.parse(
+      fs.readFileSync(__dirname + "/data/data.json", "utf8")
+    );
     const randomData = Math.floor(Math.random() * resultData.length);
 
     res.send([resultData[randomData]]);
@@ -45,14 +41,13 @@ const parseCsv = () => {
   const getJson = csvToJson.getJsonFromCsv(__dirname + "/data/zyczenia.csv");
 
   for (const data of getJson) {
-    const parsedData = {
+    jsonData.push({
       id: parseInt(data.ID),
       nazwa: data.Nazwa,
       zyczenie: data.Zyczenie,
-    };
+    });
 
-    jsonData.push(parsedData);
-    writeFileSync(__dirname + "/data/data.json", JSON.stringify(jsonData));
+    fs.writeFileSync(__dirname + "/data/data.json", JSON.stringify(jsonData));
   }
 };
 
