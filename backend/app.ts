@@ -13,11 +13,32 @@ const watcher = chokidar.watch(__dirname + "/data/zyczenia.csv", {
   persistent: true,
 });
 
-type DataTypes = {
-  id: number;
-  nazwa: string;
-  zyczenie: string;
-};
+app
+  .use(cors())
+  .get("/api/", (req, res) => {
+    const resultFile = readFileSync(__dirname + "/data/data.json", "utf8");
+    const resultData = JSON.parse(resultFile);
+    const randomData = Math.floor(Math.random() * resultData.length);
+
+    res.send([resultData[randomData]]);
+  })
+
+  .listen(port, () => {
+    console.log(
+      `\x1b[0mAplikacja działa na porcie :${port}. Baw się dobrze z danymi!\n`,
+      `\x1b[34m\nlocalhost:${port} http://localhost:${port}/api/\x1b[0m\n`
+    );
+  });
+
+watcher
+  .on("add", () => {
+    parseCsv();
+    console.info(`Plik zyczenia.csv został pomyślnie wykryty!`);
+  })
+  .on("change", () => {
+    parseCsv();
+    console.info(`Nastąpiła modyfikacja pliku zyczenia.csv - parsuję...`);
+  });
 
 const parseCsv = () => {
   const jsonData = <Array<DataTypes>>[];
@@ -35,29 +56,8 @@ const parseCsv = () => {
   }
 };
 
-watcher
-  .on("add", () => {
-    parseCsv();
-    console.info(`Plik zyczenia.csv został pomyślnie wykryty!`);
-  })
-  .on("change", () => {
-    parseCsv();
-    console.info(`Nastąpiła modyfikacja pliku zyczenia.csv - parsuję...`);
-  });
-
-app
-  .use(cors())
-  .get("/api/", (req, res) => {
-    const resultFile = readFileSync(__dirname + "/data/data.json", "utf8");
-    const resultData = JSON.parse(resultFile);
-    const randomData = Math.floor(Math.random() * resultData.length);
-
-    res.send([resultData[randomData]]);
-  })
-
-  .listen(port, () => {
-    console.log(
-      `\x1b[0mAplikacja działa na porcie :${port}. Baw się dobrze z danymi!\n`,
-      `\x1b[34m\nlocalhost:${port} http://localhost:${port}/api/\x1b[0m\n`
-    );
-  });
+type DataTypes = {
+  id: number;
+  nazwa: string;
+  zyczenie: string;
+};
