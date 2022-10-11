@@ -5,7 +5,7 @@ function App({ Component, pageProps }: any) {
   return (
     <>
       <Head>
-        <title>Tadeusz Piechowiak</title>
+        <title>ZSK TV Życzenia</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Component {...pageProps} />
